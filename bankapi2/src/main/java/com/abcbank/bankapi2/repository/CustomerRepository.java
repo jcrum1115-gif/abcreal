@@ -7,5 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface CustomerRepository
         extends MongoRepository<Customer, String> {
 
-    Optional<Customer> findByUsernameAndPassword(String username, String password);
+    Optional<Customer> findByUsername(String username);
 }

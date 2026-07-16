@@ -2,6 +2,12 @@ const BASE = '/api';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+export interface TokenResponse {
+  token: string;
+  customerId: string;
+  username: string;
+}
+
 export interface BankAccount {
   accountNumber: string;
   balance: number;
@@ -36,8 +42,13 @@ export interface Transaction {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = localStorage.getItem('token');
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options?.headers,
+    },
     ...options,
   });
   if (!res.ok) {
@@ -63,7 +74,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 // ── Customers ────────────────────────────────────────────────────────────────
 
 export const login = (username: string, password: string) =>
-  request<Customer>('/auth/login', {
+  request<TokenResponse>('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
   });

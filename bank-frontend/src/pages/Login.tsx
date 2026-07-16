@@ -22,10 +22,10 @@ const Login: FC<LoginProps> = ({ onLoginSuccess }) => {
 
     try {
       const result = await login(username, password);
-      if (result && result.id) {
-        // Store username and customer ID in localStorage
-        localStorage.setItem('user', JSON.stringify({ username, id: result.id }));
-        onLoginSuccess(username, result.id);
+      if (result && result.token) {
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', JSON.stringify({ username: result.username, id: result.customerId }));
+        onLoginSuccess(result.username, result.customerId);
         navigate('/');
       }
     } catch (err) {
