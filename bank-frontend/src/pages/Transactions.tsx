@@ -6,7 +6,7 @@ import {
 } from '../services/api';
 
 interface TransactionsProps {
-  username: string;
+  customerId: string;
 }
 
 const formatMoney = (amount: number) =>
@@ -23,24 +23,24 @@ const formatDate = (timestamp?: string) => {
   return new Date(timestamp).toLocaleString();
 };
 
-function Transactions({ username }: TransactionsProps) {
+function Transactions({ customerId }: TransactionsProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!username) {
+    if (!customerId) {
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    getTransactions(username)
+    getTransactions(customerId)
       .then(setTransactions)
       .catch((error: Error) => setError(error.message))
       .finally(() => setLoading(false));
-  }, [username]);
+  }, [customerId]);
 
   return (
     <main className="transactions-page">

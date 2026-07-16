@@ -51,7 +51,7 @@ function App() {
           <Header username={user} onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<Home customerId={customerId} />} />
-            <Route path="/transactions" element={<Transactions username={user} />} />
+            <Route path="/transactions" element={<Transactions customerId={customerId} />} />
 
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
