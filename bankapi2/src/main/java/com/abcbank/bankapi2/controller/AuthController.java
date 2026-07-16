@@ -1,15 +1,14 @@
 package com.abcbank.bankapi2.controller;
 
+import com.abcbank.bankapi2.dto.LoginRequest;
+import com.abcbank.bankapi2.model.Customer;
+import com.abcbank.bankapi2.repository.CustomerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.abcbank.bankapi2.dto.LoginRequest;
-import com.abcbank.bankapi2.model.Customer;
-import com.abcbank.bankapi2.repository.CustomerRepository;
 
 @RestController
 @RequestMapping("/auth")
