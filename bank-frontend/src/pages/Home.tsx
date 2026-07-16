@@ -89,8 +89,8 @@ const Home: FC<HomeProps> = ({ customerId }) => {
     try {
       const accountType = selectedAccount.accountType.toLowerCase();
       await (action === 'deposit'
-        ? deposit(selectedCustomerUsername, amount, accountType)
-        : withdraw(selectedCustomerUsername, amount, accountType));
+        ? deposit(selectedCustomerId, amount, accountType)
+        : withdraw(selectedCustomerId, amount, accountType));
       
       setActionAmount('');
       setActionStatus(`${action === 'deposit' ? 'Deposited' : 'Withdrew'} ${fmt(amount)} successfully.`);
@@ -128,7 +128,7 @@ const Home: FC<HomeProps> = ({ customerId }) => {
       const fromType = selectedAccount.accountType.toLowerCase();
       const toType = toAccount.accountType.toLowerCase();
       await transfer(
-            selectedCustomerUsername,
+            selectedCustomerId,
             fromType,
             toType,
             amount
