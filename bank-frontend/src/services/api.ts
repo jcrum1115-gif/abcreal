@@ -1,4 +1,6 @@
-const BASE = '/api';
+const BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://abcbank-4fcf.onrender.com";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -57,16 +59,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   }
   const text = await res.text();
   if (!text || text.trim() === '') {
-    // Empty response is OK (e.g., deposit/withdraw return 200 with no body)
-    console.log(`✓ ${options?.method} ${BASE}${path} - Success (empty response)`);
     return undefined as T;
   }
   try {
-    const data = JSON.parse(text) as T;
-    console.log(`✓ ${options?.method} ${BASE}${path}`, data);
-    return data;
-  } catch (e) {
-    console.error('Failed to parse JSON:', text, e);
+    return JSON.parse(text) as T;
+  } catch {
     return undefined as T;
   }
 }
