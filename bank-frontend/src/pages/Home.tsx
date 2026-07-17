@@ -156,12 +156,39 @@ const Home: FC<HomeProps> = ({ customerId }) => {
     }
   };
 
-  if (loadingCustomers) return <main className="dashboard"><p>Loading accounts…</p></main>;
-  if (error) return <main className="dashboard"><p style={{ color: 'red' }}>Error: {error}</p></main>;
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const displayName = selected?.username
+    ? selected.username.charAt(0).toUpperCase() + selected.username.slice(1)
+    : '';
+
+  const todayLabel = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric',
+  });
+
+  if (loadingCustomers) return (
+    <main className="dashboard">
+      <div className="dashboard-loading">
+        <div className="loading-spinner" />
+        <p>Loading your accounts…</p>
+      </div>
+    </main>
+  );
+  if (error) return <main className="dashboard"><p className="dashboard-error">Error: {error}</p></main>;
 
   return (
     <main className="dashboard">
-      <h2 className="greeting">Good morning 👋</h2>
+      <div className="greeting-block">
+        <div>
+          <h2 className="greeting">{getGreeting()}{displayName ? `, ${displayName}` : ''} 👋</h2>
+          <p className="greeting-sub">{todayLabel}</p>
+        </div>
+      </div>
 
       <section className="accounts">
         <h3>Your Accounts</h3>
@@ -173,10 +200,11 @@ const Home: FC<HomeProps> = ({ customerId }) => {
               onClick={() => setSelectedAccountIdx(idx)}
             >
               <div className="account-card-header">
-                <span className="account-name">{acc.accountType}</span>
-                <span className="account-number">{acc.accountNumber}</span>
+                <span className="account-name">{acc.accountType.charAt(0) + acc.accountType.slice(1).toLowerCase()}</span>
+                <span className="account-number">••{acc.accountNumber?.slice(-4)}</span>
               </div>
               <div className="account-balance">{fmt(acc.balance)}</div>
+              <div className="account-card-label">Available balance</div>
             </button>
           ))}
         </div>
@@ -188,41 +216,31 @@ const Home: FC<HomeProps> = ({ customerId }) => {
             <h3>Quick Actions</h3>
             {action === 'transfer' ? (
               <>
-                <div style={{ marginBottom: '0.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.25rem', color: '#4a5568' }}>
-                    From Account
-                  </label>
-                  <p style={{ margin: '0', padding: '0.5rem', background: '#f7fafc', borderRadius: '6px', fontSize: '0.9rem' }}>
-                    {selectedAccount?.accountType} ({selectedAccount?.accountNumber})
+                <div className="action-field">
+                  <label>From Account</label>
+                  <p className="action-field-value">
+                    {selectedAccount?.accountType} (••{selectedAccount?.accountNumber?.slice(-4)})
                   </p>
                 </div>
-                <div style={{ marginBottom: '0.5rem' }}>
-                  <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.25rem', color: '#4a5568' }}>
-                    To Account
-                  </label>
+                <div className="action-field">
+                  <label>To Account</label>
                   <select
+                    className="action-select"
                     value={transferToAccountIdx ?? ''}
                     onChange={(e) => setTransferToAccountIdx(e.target.value ? parseInt(e.target.value) : null)}
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      borderRadius: '6px',
-                      border: '1px solid #cbd5e0',
-                      fontSize: '1rem',
-                      boxSizing: 'border-box',
-                    }}
                   >
                     <option value="">Select destination account</option>
                     {selected?.__accounts?.map((acc, idx) => (
                       idx !== selectedAccountIdx && (
                         <option key={idx} value={idx}>
-                          {acc.accountType} ({acc.accountNumber})
+                          {acc.accountType} (••{acc.accountNumber?.slice(-4)})
                         </option>
                       )
                     ))}
                   </select>
                 </div>
                 <input
+                  className="action-input"
                   type="number"
                   min="0"
                   step="0.01"
@@ -230,24 +248,16 @@ const Home: FC<HomeProps> = ({ customerId }) => {
                   value={actionAmount}
                   onChange={(e) => setActionAmount(e.target.value)}
                   onFocus={() => setActionStatus(null)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginBottom: '0.5rem',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e0',
-                    fontSize: '1rem',
-                    boxSizing: 'border-box',
-                  }}
                 />
                 <div className="actions-grid">
-                  <button className="action-btn" onClick={handleTransfer}>Confirm</button>
-                  <button className="action-btn" onClick={() => { setAction(null); setActionAmount(''); setTransferToAccountIdx(null); setActionStatus(null); }}>Cancel</button>
+                  <button className="action-btn action-btn--confirm" onClick={handleTransfer}>Confirm</button>
+                  <button className="action-btn action-btn--cancel" onClick={() => { setAction(null); setActionAmount(''); setTransferToAccountIdx(null); setActionStatus(null); }}>Cancel</button>
                 </div>
               </>
             ) : (
               <>
                 <input
+                  className="action-input"
                   type="number"
                   min="0"
                   step="0.01"
@@ -255,25 +265,17 @@ const Home: FC<HomeProps> = ({ customerId }) => {
                   value={actionAmount}
                   onChange={(e) => setActionAmount(e.target.value)}
                   onFocus={() => setActionStatus(null)}
-                  style={{
-                    width: '100%',
-                    padding: '0.5rem',
-                    marginBottom: '0.5rem',
-                    borderRadius: '6px',
-                    border: '1px solid #cbd5e0',
-                    fontSize: '1rem',
-                    boxSizing: 'border-box',
-                  }}
                 />
                 <div className="actions-grid">
-                  <button className="action-btn" onClick={() => handleAction('deposit')}>Deposit</button>
-                  <button className="action-btn" onClick={() => handleAction('withdraw')}>Withdraw</button>
-                  <button className="action-btn" onClick={() => { setAction('transfer'); setActionAmount(''); setActionStatus(null); }}>Transfer</button>
-                  <Link className="action-btn" to="/transactions"> Transactions </Link></div>
+                  <button className="action-btn action-btn--deposit" onClick={() => handleAction('deposit')}>⬇ Deposit</button>
+                  <button className="action-btn action-btn--withdraw" onClick={() => handleAction('withdraw')}>⬆ Withdraw</button>
+                  <button className="action-btn action-btn--transfer" onClick={() => { setAction('transfer'); setActionAmount(''); setActionStatus(null); }}>⇄ Transfer</button>
+                  <Link className="action-btn action-btn--history" to="/transactions">☰ History</Link>
+                </div>
               </>
             )}
             {actionStatus && (
-              <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: '#4a5568' }}>{actionStatus}</p>
+              <p className={`action-status${actionStatus.toLowerCase().includes('error') || actionStatus.toLowerCase().includes('invalid') || actionStatus.toLowerCase().includes('enter') ? ' action-status--error' : ' action-status--ok'}`}>{actionStatus}</p>
             )}
           </section>
 
@@ -298,38 +300,15 @@ const Home: FC<HomeProps> = ({ customerId }) => {
             <ul className="tx-list">
               {transactions.map((tx, idx) => (
                 <li key={`${idx}-${tx.timestamp}`} className="tx-item">
-  <div className="tx-info">
-    <span className="tx-desc">
-      {tx.type.replace('_', ' ')}
-    </span>
-
-    <span className="tx-date">
-      {new Date(tx.timestamp).toLocaleString()}
-    </span>
-
-    <span
-      style={{
-        fontSize: '0.8rem',
-        color: '#718096'
-      }}
-    >
-      {tx.accountType}
-    </span>
-  </div>
-
-  <span
-    className={`tx-amount ${
-      tx.type === 'DEPOSIT' || tx.type === 'TRANSFER_IN'
-        ? 'positive-amount'
-        : 'negative-amount'
-    }`}
-  >
-    {tx.type === 'DEPOSIT' || tx.type === 'TRANSFER_IN'
-      ? '+'
-      : '-'}
-    {fmt(tx.amount)}
-  </span>
-</li>
+                  <div className="tx-info">
+                    <span className="tx-desc">{tx.type.replaceAll('_', ' ')}</span>
+                    <span className="tx-date">{new Date(tx.timestamp).toLocaleString()}</span>
+                    <span className="tx-account-tag">{tx.accountType}</span>
+                  </div>
+                  <span className={`tx-amount ${tx.type === 'DEPOSIT' || tx.type === 'TRANSFER_IN' ? 'credit' : 'debit'}`}>
+                    {tx.type === 'DEPOSIT' || tx.type === 'TRANSFER_IN' ? '+' : '-'}{fmt(tx.amount)}
+                  </span>
+                </li>
               ))}
             </ul>
           )}
