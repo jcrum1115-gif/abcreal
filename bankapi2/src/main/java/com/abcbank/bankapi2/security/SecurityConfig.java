@@ -51,10 +51,11 @@ public class SecurityConfig {
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/",
-                    "/health",
-                    "/login"
-                ).permitAll()
+                        "/",
+                        "/health",
+                        "/error",
+                        "/auth/login"
+                    ).permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
